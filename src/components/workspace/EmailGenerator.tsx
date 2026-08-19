@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AiSkeleton } from "./AiSkeleton";
 
 type Tone = "Formal" | "Friendly" | "Persuasive";
 
@@ -67,10 +68,11 @@ export function EmailGenerator() {
 
   const generate = () => {
     setLoading(true);
+    setDraft("");
     setTimeout(() => {
       setDraft(buildEmail(context, tone, recipient));
       setLoading(false);
-    }, 550);
+    }, 1500);
   };
 
   const copy = async () => {
@@ -83,8 +85,8 @@ export function EmailGenerator() {
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <Card>
+    <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+      <Card className="card-hover h-fit">
         <CardHeader>
           <CardTitle>Compose inputs</CardTitle>
           <CardDescription>Tell the assistant what the email needs to achieve.</CardDescription>
@@ -125,33 +127,46 @@ export function EmailGenerator() {
             />
           </div>
 
-          <Button onClick={generate} disabled={loading} className="w-full">
-            <Sparkles className="size-4" />
+          <Button
+            onClick={generate}
+            disabled={loading}
+            className="w-full transition-all duration-200 hover:shadow-[var(--shadow-glow)] active:scale-[0.99]"
+          >
+            <Sparkles className={loading ? "size-4 animate-pulse" : "size-4"} />
             {loading ? "Generating…" : "Generate Draft"}
           </Button>
         </CardContent>
       </Card>
 
-      <Card className="animate-in fade-in duration-300">
-        <CardHeader className="flex-row items-start justify-between gap-4">
-          <div className="space-y-1.5">
+      <Card className="card-hover animate-in fade-in duration-300">
+        <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <div className="min-w-0 space-y-1.5">
             <CardTitle>Generated draft</CardTitle>
             <CardDescription>Editable — refine before you send.</CardDescription>
           </div>
-          <Button variant="outline" size="sm" onClick={copy} disabled={!draft}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={copy}
+            disabled={!draft}
+            className="shrink-0 transition-colors hover:border-primary/40 hover:text-primary"
+          >
             <Copy className="size-4" />
-            Copy to Clipboard
+            <span className="hidden sm:inline">Copy to Clipboard</span>
+            <span className="sm:hidden">Copy</span>
           </Button>
         </CardHeader>
         <CardContent>
-          {draft ? (
+          {loading ? (
+            <AiSkeleton lines={10} label="Drafting your email…" className="min-h-[420px]" />
+          ) : draft ? (
             <Textarea
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              className="min-h-[420px] resize-y text-[13px] leading-relaxed"
+              className="min-h-[320px] resize-y text-[13px] leading-relaxed sm:min-h-[420px]"
             />
           ) : (
-            <div className="flex min-h-[420px] items-center justify-center rounded-lg border border-dashed border-border text-sm text-muted-foreground">
+            <div className="flex min-h-[320px] items-center justify-center rounded-lg border border-dashed border-border px-4 text-center text-sm text-muted-foreground sm:min-h-[420px]">
               Your draft will appear here.
             </div>
           )}
