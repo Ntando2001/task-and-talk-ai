@@ -31,30 +31,35 @@ const shortcuts: { key: ViewKey; title: string; body: string }[] = [
 export function Overview({ onNavigate }: { onNavigate: (key: ViewKey) => void }) {
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((s) => (
-          <Card key={s.label}>
+          <Card key={s.label} className="card-hover">
             <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">{s.label}</p>
-                <s.icon className="size-4 text-primary" />
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+                <p className="truncate text-sm text-muted-foreground">{s.label}</p>
+                <s.icon className="size-4 shrink-0 text-primary" />
               </div>
-              <p className="mt-3 text-3xl font-semibold">{s.value}</p>
+              <p className="mt-3 text-2xl font-semibold sm:text-3xl">{s.value}</p>
               <p className="mt-1 text-xs text-success">{s.delta}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {shortcuts.map((s) => (
-          <Card key={s.key} className="flex flex-col">
+          <Card key={s.key} className="card-hover flex flex-col">
             <CardHeader>
               <CardTitle className="text-base">{s.title}</CardTitle>
               <CardDescription>{s.body}</CardDescription>
             </CardHeader>
             <CardContent className="mt-auto">
-              <Button variant="outline" size="sm" onClick={() => onNavigate(s.key)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onNavigate(s.key)}
+                className="transition-colors hover:border-primary/40 hover:bg-primary hover:text-primary-foreground"
+              >
                 Open tool
               </Button>
             </CardContent>

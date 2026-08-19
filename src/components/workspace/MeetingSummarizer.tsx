@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { AiSkeleton } from "./AiSkeleton";
 
 const summary = [
   "The team reviewed Q3 onboarding performance: activation is up 12% since the guided checklist launched.",
@@ -39,15 +40,16 @@ export function MeetingSummarizer() {
 
   const run = () => {
     setLoading(true);
+    setDone(false);
     setTimeout(() => {
       setDone(true);
       setLoading(false);
-    }, 650);
+    }, 1600);
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-4 sm:space-y-6">
+      <Card className="card-hover">
         <CardHeader>
           <CardTitle>Meeting input</CardTitle>
           <CardDescription>
@@ -65,26 +67,42 @@ export function MeetingSummarizer() {
               className="min-h-[220px] resize-y"
             />
           </div>
-          <Button onClick={run} disabled={loading}>
+          <Button
+            onClick={run}
+            disabled={loading}
+            className="w-full transition-all duration-200 hover:shadow-[var(--shadow-glow)] active:scale-[0.99] sm:w-auto"
+          >
             <FileSearch className="size-4" />
             {loading ? "Analysing…" : "Summarize & Extract"}
           </Button>
         </CardContent>
       </Card>
 
-      {done ? (
+      {loading ? (
+        <Card>
+          <CardContent className="pt-6">
+            <AiSkeleton lines={7} label="Extracting summary, actions and decisions…" />
+          </CardContent>
+        </Card>
+      ) : done ? (
         <Tabs
           defaultValue="summary"
           className="animate-in fade-in slide-in-from-bottom-2 duration-300"
         >
-          <TabsList>
-            <TabsTrigger value="summary">Executive Summary</TabsTrigger>
-            <TabsTrigger value="actions">Action Items &amp; Deadlines</TabsTrigger>
-            <TabsTrigger value="decisions">Key Decisions Made</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-1 gap-1 sm:inline-grid sm:w-auto sm:grid-cols-3">
+            <TabsTrigger value="summary" className="transition-all">
+              Executive Summary
+            </TabsTrigger>
+            <TabsTrigger value="actions" className="transition-all">
+              Action Items &amp; Deadlines
+            </TabsTrigger>
+            <TabsTrigger value="decisions" className="transition-all">
+              Key Decisions Made
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="summary" className="mt-4">
-            <Card>
+            <Card className="card-hover animate-in fade-in duration-300">
               <CardHeader>
                 <CardTitle className="text-base">Executive Summary</CardTitle>
               </CardHeader>
@@ -102,7 +120,7 @@ export function MeetingSummarizer() {
           </TabsContent>
 
           <TabsContent value="actions" className="mt-4">
-            <Card>
+            <Card className="card-hover animate-in fade-in duration-300">
               <CardHeader>
                 <CardTitle className="text-base">Action Items &amp; Deadlines</CardTitle>
               </CardHeader>
@@ -110,11 +128,11 @@ export function MeetingSummarizer() {
                 {actions.map((a) => (
                   <div
                     key={a.task}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-secondary/50 p-3"
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-secondary/50 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-secondary"
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex min-w-0 items-start gap-3">
                       <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" />
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-sm font-medium">{a.task}</p>
                         <p className="text-xs text-muted-foreground">Owner: {a.owner}</p>
                       </div>
@@ -130,7 +148,7 @@ export function MeetingSummarizer() {
           </TabsContent>
 
           <TabsContent value="decisions" className="mt-4">
-            <Card>
+            <Card className="card-hover animate-in fade-in duration-300">
               <CardHeader>
                 <CardTitle className="text-base">Key Decisions Made</CardTitle>
               </CardHeader>
@@ -149,7 +167,7 @@ export function MeetingSummarizer() {
         </Tabs>
       ) : (
         <Card>
-          <CardContent className="flex min-h-[180px] items-center justify-center text-sm text-muted-foreground">
+          <CardContent className="flex min-h-[180px] items-center justify-center px-4 text-center text-sm text-muted-foreground">
             Run an extraction to see the summary, action items, and decisions.
           </CardContent>
         </Card>

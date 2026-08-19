@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AiCardSkeleton, AiSkeleton } from "./AiSkeleton";
 
 type Priority = "High Priority" | "Medium Priority" | "Low Priority";
 type Task = { title: string; slot: string; priority: Priority };
@@ -48,15 +49,16 @@ export function TaskPlanner() {
 
   const optimize = () => {
     setLoading(true);
+    setPlan(null);
     setTimeout(() => {
       setPlan(horizon === "Daily" ? dailyPlan : weeklyPlan);
       setLoading(false);
-    }, 600);
+    }, 1600);
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
-      <Card className="h-fit">
+    <div className="grid gap-4 sm:gap-6 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
+      <Card className="card-hover h-fit">
         <CardHeader>
           <CardTitle>Planner</CardTitle>
           <CardDescription>Drop in your list and let the assistant sequence it.</CardDescription>
@@ -85,7 +87,11 @@ export function TaskPlanner() {
             </Select>
           </div>
 
-          <Button onClick={optimize} disabled={loading} className="w-full">
+          <Button
+            onClick={optimize}
+            disabled={loading}
+            className="w-full transition-all duration-200 hover:shadow-[var(--shadow-glow)] active:scale-[0.99]"
+          >
             <Wand2 className="size-4" />
             {loading ? "Optimising…" : "Optimize Schedule"}
           </Button>
@@ -93,12 +99,17 @@ export function TaskPlanner() {
       </Card>
 
       <div className="space-y-4">
-        {plan ? (
-          <div className="grid gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300 md:grid-cols-3">
+        {loading ? (
+          <div className="space-y-4">
+            <AiCardSkeleton />
+            <AiSkeleton lines={6} label="Optimising your schedule…" />
+          </div>
+        ) : plan ? (
+          <div className="grid gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300 sm:grid-cols-2 lg:grid-cols-3">
             {columns.map((col) => {
               const items = plan.filter((t) => t.priority === col.key);
               return (
-                <Card key={col.key} className="bg-card/80">
+                <Card key={col.key} className="card-hover bg-card/80">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
                       <span className={`size-2 rounded-full ${col.accent}`} />
@@ -112,7 +123,7 @@ export function TaskPlanner() {
                     {items.map((t) => (
                       <div
                         key={t.title}
-                        className="rounded-lg border border-border bg-background p-3 transition-shadow hover:shadow-sm"
+                        className="rounded-lg border border-border bg-background p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[var(--shadow-lift)]"
                       >
                         <p className="text-sm font-medium leading-snug">{t.title}</p>
                         <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -128,14 +139,14 @@ export function TaskPlanner() {
           </div>
         ) : (
           <Card>
-            <CardContent className="flex min-h-[300px] items-center justify-center text-sm text-muted-foreground">
+            <CardContent className="flex min-h-[240px] items-center justify-center px-4 text-center text-sm text-muted-foreground sm:min-h-[300px]">
               Your optimised Kanban board will appear here.
             </CardContent>
           </Card>
         )}
 
-        {plan && (
-          <Card>
+        {plan && !loading && (
+          <Card className="card-hover">
             <CardHeader>
               <CardTitle className="text-base">
                 {horizon === "Daily" ? "Daily schedule" : "Weekly schedule"}
@@ -145,12 +156,12 @@ export function TaskPlanner() {
               {plan.map((t) => (
                 <div
                   key={`${t.title}-row`}
-                  className="flex flex-wrap items-center gap-3 rounded-lg border border-border px-3 py-2"
+                  className="flex flex-wrap items-center gap-3 rounded-lg border border-border px-3 py-2 transition-colors duration-200 hover:border-primary/30 hover:bg-secondary/60"
                 >
-                  <span className="w-32 shrink-0 text-xs font-medium text-muted-foreground">
+                  <span className="w-24 shrink-0 text-xs font-medium text-muted-foreground sm:w-32">
                     {t.slot}
                   </span>
-                  <span className="text-sm">{t.title}</span>
+                  <span className="min-w-0 text-sm">{t.title}</span>
                   <Badge variant="outline" className="ml-auto text-xs">
                     {t.priority.replace(" Priority", "")}
                   </Badge>
